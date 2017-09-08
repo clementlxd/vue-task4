@@ -46,11 +46,7 @@
 
 	"use strict";
 
-	var _bar = __webpack_require__(1);
-
-	var _bar2 = _interopRequireDefault(_bar);
-
-	var _vue = __webpack_require__(2);
+	var _vue = __webpack_require__(1);
 
 	var _vue2 = _interopRequireDefault(_vue);
 
@@ -59,26 +55,39 @@
 	var app = new _vue2.default({
 		el: "#app",
 		data: {
-			message: "Hello Vue!"
+			newTodo: "",
+			todoList: []
+		},
+		created: function created() {
+			var _this = this;
+
+			window.onbeforeunload = function () {
+				var dataString = JSON.stringify(_this.todoList);
+				window.localStorage.setItem("myTodos", dataString);
+			};
+
+			var oldDataString = window.localStorage.getItem("myTodos");
+			var oldData = JSON.parse(oldDataString);
+			this.todoList = oldData || [];
+		},
+		methods: {
+			addTodo: function addTodo() {
+				this.todoList.push({
+					title: this.newTodo,
+					createdAt: new Date(),
+					done: false
+				});
+				this.newTodo = ""; //输入结束后为空
+			},
+			removeTodo: function removeTodo(todo) {
+				var index = this.todoList.indexOf(todo);
+				this.todoList.splice(index, 1);
+			}
 		}
-	});
+	}); //import bar from './bar';
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.default = bar;
-	function bar() {
-	  alert("hello");
-	}
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process, global) {/*!
@@ -10169,10 +10178,10 @@
 
 	module.exports = Vue$3;
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), (function() { return this; }())))
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, exports) {
 
 	// shim for using process in browser
