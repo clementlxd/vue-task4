@@ -1,11 +1,29 @@
 //import bar from './bar'; 
 import Vue from "vue"
+import AV from 'leancloud-storage'
+
+var APP_ID = 'DpSeImnNgSEpOH4fskuCN81M-gzGzoHsz';
+var APP_KEY = '9VI6aw7iqnDgt1Ba6PL4sQ4f';
+
+AV.init({
+  appId: APP_ID,
+  appKey: APP_KEY
+});
+
+
 
 var app=new Vue({
 	el:"#app",
 	data:{
+		actionType:"signUp",
 		newTodo:"",
-		todoList:[]
+		todoList:[],
+		formData:{
+			username:'',
+			password:''
+		},
+		currentUser:null
+
 	},
 	created:function(){
 		window.onbeforeunload=()=>{
@@ -30,6 +48,44 @@ var app=new Vue({
 		removeTodo:function(todo){
 			let index=this.todoList.indexOf(todo)
 			this.todoList.splice(index,1)
+		},
+		signUp:function(){
+			let user=new AV.User()
+
+			user.setUsername(this.formData.username)
+			user.setPassword(this.formData.password)
+			user.signUp().then((loginedUser)=>{
+				this.currentUser=this.getCurrentUser()
+				console.log(loginedUser)
+			},(error)=>{
+				alert("注册失败")
+
+			} )
+		},
+		login: function(){
+			AV.User.logIn(this.formData.username,this.formData.password).then((longinedUser)=>{
+				this.currentUser=this.getCurrentUser()
+				console.log(loginedUser)
+			},function(error){
+				alert("登录失败")
+
+			})
+		},
+		getCurrentUser:function(){
+			//let {id, createdAt,attributes:{username}}=AV.User.current()
+			//return {id, username,createdAt}
+			let current=AV.User.current()
+			if(current){
+				let {id, createdAt,attributes:{username}}=current
+				return {id,username,createdAt}
+			}else{
+				return null
+			}
+		},
+		logout: function(){
+			AV.User.logOut()
+			this.currentUser=null
+			window.location.reload()
 		}
 	}
 })
